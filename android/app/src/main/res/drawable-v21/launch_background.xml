@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TapIn360 splash: brand blue (primary-strong #2563eb) with the white NFC motif. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/tapin_splash" />
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/splash_motif" />
+    </item>
+</layer-list>

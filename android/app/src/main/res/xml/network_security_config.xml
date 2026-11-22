@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Plain http:// is refused for every host except the phone itself and the emulator's
+  host loopback: localhost / 127.0.0.1 (local servers over `adb reverse`, e.g.
+  http://localhost:8046) and 10.0.2.2 (Android emulator → the computer). This is in
+  main, not debug-only: release APKs are tested over `adb reverse` too. Every other
+  server must use https:// (spec §7.4); the app also refuses such URLs before any
+  request (lib/core/config/server_url.dart, isInsecureServerUrl).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>
