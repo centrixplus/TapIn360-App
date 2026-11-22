@@ -49,7 +49,7 @@ void main() {
         'tapin://company/',
         'tapin://company/a/b',
         'tapin://company/1abc',
-        'https://acme.karrix.com',
+        'https://acme.tapin360.co',
         'https://evil.example/company/acme',
         'WIFI:S:office;T:WPA;P:secret;;',
         '',

@@ -225,7 +225,11 @@
     "checking": "جارٍ التحقق…",
     "logout": "تسجيل الخروج من التطبيق",
     "version": "TapIn360 {version}",
-    "approximate": "تقريبي فقط"
+    "approximate": "تقريبي فقط",
+    "privacy": "سياسة الخصوصية",
+    "support": "الدعم",
+    "delete_account": "حذف حسابي",
+    "link_failed": "تعذّر فتح الصفحة. زُر {url}"
   },
   "logout": {
     "confirm_title": "تسجيل الخروج من التطبيق؟",

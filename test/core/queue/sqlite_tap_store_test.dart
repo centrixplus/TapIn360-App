@@ -230,6 +230,22 @@ void main() {
     expect(theirs.resultCode, 'discarded');
   });
 
+  test("a discarded tap drops the other employee's photo bytes, keeps the metadata", () async {
+    final mine = waitingTap(uuid: 'mine', employeeId: 17);
+    final theirs = waitingTap(uuid: 'theirs', employeeId: 99);
+    for (final tap in [mine, theirs]) {
+      tap.request['photo'] = {'mime': 'image/jpeg', 'data': 'QUJD', 'taken_at': '2026-11-17T09:02:15+03:00', 'faces': 1};
+      await store.insert(tap);
+    }
+    expect(await store.rejectWaitingNotOwnedBy(17, message: ''), 1);
+    final discarded = (await store.byUuid('theirs'))!.request['photo']! as Map;
+    expect(discarded.containsKey('data'), isFalse);
+    expect(discarded['faces'], 1);
+    expect(discarded['taken_at'], '2026-11-17T09:02:15+03:00');
+    // The logged-in employee's own waiting tap still carries its photo for the resend.
+    expect(((await store.byUuid('mine'))!.request['photo']! as Map)['data'], 'QUJD');
+  });
+
   test('changes emits after every mutation', () async {
     var events = 0;
     final sub = store.changes.listen((_) => events++);

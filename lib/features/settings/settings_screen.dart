@@ -5,14 +5,16 @@ import 'package:nfc_manager/nfc_manager.dart';
 
 import '../../app/providers.dart';
 import '../../app/tokens.dart';
+import '../../core/config/tapin_config.dart';
 import '../../core/device/device_descriptor.dart';
 import '../../core/location/location_gateway.dart';
 import '../common/tapin_widgets.dart';
 import 'device_status.dart';
 import 'logout_flow.dart';
 
-/// Company (Change), language, phone ID, permissions, Prepare wall card,
-/// Log out, version (AppSettings artboard).
+/// Company (Change), language, phone ID, permissions, links to the privacy
+/// policy / support / account deletion pages, Log out, version (AppSettings
+/// artboard).
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -46,6 +48,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
   Future<void> _changeCompany() async {
     if (!await confirmChangeCompany(context, ref)) return;
     await ref.read(sessionProvider.notifier).changeCompany();
+  }
+
+  /// The tapin360.co page in the app's language, in the phone's browser.
+  Future<void> _openPage(WebsitePage page) async {
+    final url = websitePageUrl(page, context.locale.languageCode);
+    final messenger = ScaffoldMessenger.of(context);
+    final failed = 'settings.link_failed'.tr(namedArgs: {'url': url.toString()});
+    if (!await ref.read(browserProvider)(url)) {
+      messenger.showSnackBar(SnackBar(content: Text(failed)));
+    }
   }
 
   @override
@@ -138,6 +150,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                 ],
               ),
             ),
+            TapInCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  _LinkRow(
+                    key: const Key('settings.privacy'),
+                    label: 'settings.privacy'.tr(),
+                    onTap: () => _openPage(WebsitePage.privacy),
+                  ),
+                  const Divider(height: 1, color: TapInColors.border),
+                  _LinkRow(
+                    key: const Key('settings.support'),
+                    label: 'settings.support'.tr(),
+                    onTap: () => _openPage(WebsitePage.support),
+                  ),
+                  const Divider(height: 1, color: TapInColors.border),
+                  _LinkRow(
+                    key: const Key('settings.delete_account'),
+                    label: 'settings.delete_account'.tr(),
+                    onTap: () => _openPage(WebsitePage.deleteAccount),
+                  ),
+                ],
+              ),
+            ),
           ],
           bottom: [
             OutlinedButton(
@@ -193,6 +229,38 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), child: child);
+}
+
+/// A row that opens a website page in the browser.
+class _LinkRow extends StatelessWidget {
+  const _LinkRow({super.key, required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final arabic = isArabic(context);
+    return Semantics(
+      link: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: _Row(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(label, style: TapInText.body(arabic: arabic)),
+                ),
+                const Icon(Icons.open_in_new_rounded, size: 18, color: TapInColors.inkMuted),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 enum _ValueKind { ok, bad, plain }

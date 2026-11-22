@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../core/api/attendance_api.dart';
 import '../core/config/tapin_config.dart';
 import '../core/directory/directory_api.dart';
+import '../core/device/browser.dart';
 import '../core/device/device_descriptor.dart';
 import '../core/device/local_ip.dart';
 import '../core/device/system_channel.dart';
@@ -154,6 +155,10 @@ final directoryApiProvider = Provider<DirectoryApi>((ref) {
 /// Opens the QR scanner and returns the company code, or null (cancelled).
 /// Overridden in widget tests.
 final qrScannerProvider = Provider<Future<String?> Function(BuildContext context)>((_) => scanCompanyQr);
+
+/// Opens a website page in the browser (Settings → Privacy policy, Support,
+/// Delete my account); false when it could not. Overridden in widget tests.
+final browserProvider = Provider<Future<bool> Function(Uri url)>((_) => openInBrowser);
 final launchTagChannelProvider = Provider<LaunchTagChannel>((_) => LaunchTagChannel());
 final systemChannelProvider = Provider<SystemChannel>((_) => SystemChannel());
 

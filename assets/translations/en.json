@@ -225,7 +225,11 @@
     "checking": "Checking…",
     "logout": "Log out",
     "version": "TapIn360 {version}",
-    "approximate": "Approximate only"
+    "approximate": "Approximate only",
+    "privacy": "Privacy policy",
+    "support": "Support",
+    "delete_account": "Delete my account",
+    "link_failed": "Couldn't open the page. Visit {url}"
   },
   "logout": {
     "confirm_title": "Log out?",

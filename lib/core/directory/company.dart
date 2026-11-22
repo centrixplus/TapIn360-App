@@ -26,7 +26,7 @@ class Company {
   /// Active, or in the grace period after expiry (the app keeps working).
   bool get canLogIn => status == CompanyStatus.active || status == CompanyStatus.grace;
 
-  /// Host shown under the name, e.g. `acme.karrix.com`.
+  /// Host shown under the name, e.g. `acme.tapin360.co`.
   String get host => Uri.tryParse(apiBaseUrl)?.host ?? '';
 
   /// Up to two initials for the logo placeholder.

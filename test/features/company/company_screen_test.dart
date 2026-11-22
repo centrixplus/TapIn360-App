@@ -13,7 +13,7 @@ import '../../helpers/localized.dart';
 import '../../helpers/queue_fixtures.dart';
 import '../../helpers/stub_adapter.dart';
 
-Map<String, Object?> acme({String status = 'active', String base = 'https://acme.karrix.com/nfc/api/v1'}) => {
+Map<String, Object?> acme({String status = 'active', String base = 'https://acme.tapin360.co/nfc/api/v1'}) => {
   'code': 'acme',
   'name': 'Acme Trading Co.',
   'logo_url': null,
@@ -47,7 +47,7 @@ void main() {
             directoryApiProvider.overrideWith(
               (ref) => DirectoryApi(
                 dio: createApiDio()..httpClientAdapter = directory,
-                masterUrl: 'https://tapin360-account.karrix.com',
+                masterUrl: 'https://account.tapin360.co',
                 language: () => 'en',
               ),
             ),
@@ -108,17 +108,17 @@ void main() {
     await continueWith(tester, ' Acme ');
     expect(
       directory.requests.single.uri.toString(),
-      'https://tapin360-account.karrix.com/tapin/api/v1/company/acme',
+      'https://account.tapin360.co/tapin/api/v1/company/acme',
     );
     expect(find.text('Acme Trading Co.'), findsOneWidget);
-    expect(find.text('acme.karrix.com'), findsOneWidget);
+    expect(find.text('acme.tapin360.co'), findsOneWidget);
     expect(find.text('AT'), findsOneWidget, reason: 'initials when there is no logo');
     expect(container.read(sessionProvider).hasServer, isFalse);
 
     await tester.tap(find.byKey(const Key('company.continue')));
     await settle(tester);
     final session = container.read(sessionProvider);
-    expect(session.serverUrl, 'https://acme.karrix.com/nfc/api/v1');
+    expect(session.serverUrl, 'https://acme.tapin360.co/nfc/api/v1');
     expect(session.company!.code, 'acme');
   });
 

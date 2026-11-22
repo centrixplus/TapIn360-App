@@ -219,13 +219,28 @@ class SqliteTapStore implements TapStore {
     return deleted;
   }
 
+  /// Like every finished row, a discarded one keeps only the photo metadata:
+  /// it is never sent, so the previous employee's photo leaves the phone.
   @override
   Future<int> rejectWaitingNotOwnedBy(int employeeId, {required String message}) async {
-    final updated = await _db.rawUpdate(
-      'UPDATE $_table SET status = ?, result_code = ?, result_message = ? '
-      'WHERE status = ? AND (employee_id IS NULL OR employee_id != ?)',
-      [TapStatus.rejected.name, ErrorCodes.discarded, message, TapStatus.waiting.name, employeeId],
-    );
+    final updated = await _db.transaction((txn) async {
+      final rows = await txn.query(
+        _table,
+        columns: ['client_uuid', 'request'],
+        where: 'status = ? AND (employee_id IS NULL OR employee_id != ?)',
+        whereArgs: [TapStatus.waiting.name, employeeId],
+      );
+      for (final row in rows) {
+        final request = jsonDecode(row['request'] as String) as Map<String, Object?>;
+        final photo = request['photo'];
+        if (photo is Map<String, Object?>) photo.remove('data');
+        await txn.rawUpdate(
+          'UPDATE $_table SET status = ?, result_code = ?, result_message = ?, request = ? WHERE client_uuid = ?',
+          [TapStatus.rejected.name, ErrorCodes.discarded, message, jsonEncode(request), row['client_uuid']],
+        );
+      }
+      return rows.length;
+    });
     if (updated > 0) _changed();
     return updated;
   }

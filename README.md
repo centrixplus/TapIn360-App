@@ -25,7 +25,7 @@ and shows the company's name and logo; **Continue** stores its `api_base_url` an
 "We can't find that company code". **Use a custom server** keeps the manual Server URL setup for
 on-premise or other servers. **Settings → Change** (company) logs out (unsent-taps confirmation).
 
-The master is a build-time constant, default `https://tapin360-account.karrix.com`:
+The master is a build-time constant, default `https://account.tapin360.co`:
 
 ```bash
 flutter run --dart-define=TAPIN_MASTER_URL=http://localhost:8051   # local master over adb reverse

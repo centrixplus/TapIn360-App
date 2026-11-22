@@ -21,7 +21,7 @@ const base = 'http://localhost:8046/nfc/api/v1';
 const acme = Company(
   code: 'acme',
   name: 'Acme Trading Co.',
-  apiBaseUrl: 'https://acme.karrix.com/nfc/api/v1',
+  apiBaseUrl: 'https://acme.tapin360.co/nfc/api/v1',
   status: CompanyStatus.active,
 );
 
@@ -203,12 +203,12 @@ void main() {
   test('choosing a company stores its API base and the company; logged out', () async {
     await build();
     await controller.chooseCompany(acme);
-    expect(controller.state.serverUrl, 'https://acme.karrix.com/nfc/api/v1');
+    expect(controller.state.serverUrl, 'https://acme.tapin360.co/nfc/api/v1');
     expect(controller.state.company!.name, 'Acme Trading Co.');
     expect(controller.state.isLoggedIn, isFalse);
     final stored = await storage.load();
     expect(stored.company!.code, 'acme');
-    expect(stored.serverUrl, 'https://acme.karrix.com/nfc/api/v1');
+    expect(stored.serverUrl, 'https://acme.tapin360.co/nfc/api/v1');
   });
 
   test('a custom server URL clears the company', () async {

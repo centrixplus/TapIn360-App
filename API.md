@@ -490,9 +490,9 @@ typed or scanned from a QR (`tapin://company/<code>`), then the app calls the Ta
 directory (not part of this attendance API):
 
 ```
-GET https://tapin360-account.karrix.com/tapin/api/v1/company/<code>
+GET https://account.tapin360.co/tapin/api/v1/company/<code>
 200 {"code": "acme", "name": "Acme Trading Co.", "logo_url": null,
-     "api_base_url": "https://acme.karrix.com/nfc/api/v1", "status": "active"}
+     "api_base_url": "https://acme.tapin360.co/nfc/api/v1", "status": "active"}
 404 {"error": {"code": "not_found", "message": "Not found."}}
 ```
 

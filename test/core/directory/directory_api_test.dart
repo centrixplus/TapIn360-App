@@ -14,7 +14,7 @@ void main() {
   Map<String, Object?> company({
     String status = 'active',
     Object? logo,
-    String base = 'https://acme.karrix.com/nfc/api/v1',
+    String base = 'https://acme.tapin360.co/nfc/api/v1',
   }) => {
     'code': 'acme',
     'name': 'Acme Trading Co.',
@@ -34,10 +34,10 @@ void main() {
   });
 
   test('master URL is a build-time constant with the production default', () {
-    expect(tapinMasterUrl, 'https://tapin360-account.karrix.com');
+    expect(tapinMasterUrl, 'https://account.tapin360.co');
     expect(
-      directoryUrl('https://tapin360-account.karrix.com/', 'acme'),
-      'https://tapin360-account.karrix.com/tapin/api/v1/company/acme',
+      directoryUrl('https://account.tapin360.co/', 'acme'),
+      'https://account.tapin360.co/tapin/api/v1/company/acme',
     );
   });
 
@@ -52,7 +52,7 @@ void main() {
     expect(found.code, 'acme');
     expect(found.name, 'Acme Trading Co.');
     expect(found.logoUrl, isNull);
-    expect(found.apiBaseUrl, 'https://acme.karrix.com/nfc/api/v1');
+    expect(found.apiBaseUrl, 'https://acme.tapin360.co/nfc/api/v1');
     expect(found.status, CompanyStatus.active);
   });
 
@@ -64,16 +64,16 @@ void main() {
   });
 
   test('api_base_url is normalised (trailing slash)', () async {
-    adapter.handler = (_) => jsonResponse(200, company(base: 'https://entest2.karrix.com/nfc/api/v1/'));
+    adapter.handler = (_) => jsonResponse(200, company(base: 'https://entest2.tapin360.co/nfc/api/v1/'));
     expect(
       (await api.lookup('acme') as CompanyFound).company.apiBaseUrl,
-      'https://entest2.karrix.com/nfc/api/v1',
+      'https://entest2.tapin360.co/nfc/api/v1',
     );
   });
 
   test('a plain http:// api_base_url on another host → insecure (https required), never found', () async {
     for (final base in [
-      'http://acme.karrix.com/nfc/api/v1',
+      'http://acme.tapin360.co/nfc/api/v1',
       'http://10.0.0.5:8069/nfc/api/v1',
       'http://entest2.localhost:8050/nfc/api/v1',
     ]) {

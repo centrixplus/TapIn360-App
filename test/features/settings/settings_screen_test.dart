@@ -19,15 +19,22 @@ import '../../helpers/stub_adapter.dart';
 const acme = Company(
   code: 'acme',
   name: 'Acme Trading Co.',
-  apiBaseUrl: 'https://acme.karrix.com/nfc/api/v1',
+  apiBaseUrl: 'https://acme.tapin360.co/nfc/api/v1',
   status: CompanyStatus.active,
 );
 
 void main() {
   late SqliteTapStore taps;
   late ProviderContainer container;
+  // The browser, mocked: every URL Settings asks it to open, and its answer.
+  late List<Uri> opened;
+  late bool browserOpens;
 
-  setUp(() async => taps = await openMemoryStore());
+  setUp(() async {
+    taps = await openMemoryStore();
+    opened = [];
+    browserOpens = true;
+  });
   tearDown(() => taps.close());
 
   Future<void> pump(WidgetTester tester, {Locale locale = const Locale('en'), bool? camera = true}) async {
@@ -46,6 +53,10 @@ void main() {
           adapter: StubAdapter((_) => jsonResponse(200, {'ok': true})),
           store: memorySessionStore(),
           extra: [
+            browserProvider.overrideWithValue((url) async {
+              opened.add(url);
+              return browserOpens;
+            }),
             deviceStatusProvider.overrideWith(
               (ref) async => DeviceStatus(
                 location: LocationAccess.granted,
@@ -102,6 +113,61 @@ void main() {
     expect(session.isLoggedIn, isFalse);
     expect(session.hasServer, isFalse);
     expect(session.company, isNull);
+  });
+
+  Future<void> tapLink(WidgetTester tester, String key) async {
+    await tester.ensureVisible(find.byKey(Key(key)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(Key(key)));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('Privacy policy, Support and Delete my account open tapin360.co/en in the browser', (tester) async {
+    await pump(tester);
+    expect(find.text('Privacy policy'), findsOneWidget);
+    expect(find.text('Support'), findsOneWidget);
+    expect(find.text('Delete my account'), findsOneWidget);
+    await tapLink(tester, 'settings.privacy');
+    await tapLink(tester, 'settings.support');
+    await tapLink(tester, 'settings.delete_account');
+    expect(opened, [
+      Uri.parse('https://tapin360.co/en/app/privacy'),
+      Uri.parse('https://tapin360.co/en/support'),
+      Uri.parse('https://tapin360.co/en/delete-account'),
+    ]);
+    expect(find.byType(SnackBar), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('in Arabic the links open the Arabic pages', (tester) async {
+    await pump(tester, locale: const Locale('ar'));
+    expect(find.text('سياسة الخصوصية'), findsOneWidget);
+    expect(find.text('الدعم'), findsOneWidget);
+    expect(find.text('حذف حسابي'), findsOneWidget);
+    await tapLink(tester, 'settings.privacy');
+    await tapLink(tester, 'settings.support');
+    await tapLink(tester, 'settings.delete_account');
+    expect(opened, [
+      Uri.parse('https://tapin360.co/ar/app/privacy'),
+      Uri.parse('https://tapin360.co/ar/support'),
+      Uri.parse('https://tapin360.co/ar/delete-account'),
+    ]);
+  });
+
+  testWidgets('switching the language switches the pages the links open', (tester) async {
+    await pump(tester);
+    await tester.tap(find.byKey(const Key('settings.lang_ar')));
+    await tester.pumpAndSettle();
+    await tapLink(tester, 'settings.support');
+    expect(opened, [Uri.parse('https://tapin360.co/ar/support')]);
+  });
+
+  testWidgets('no browser → the page address is shown instead', (tester) async {
+    browserOpens = false;
+    await pump(tester);
+    await tapLink(tester, 'settings.support');
+    expect(opened, [Uri.parse('https://tapin360.co/en/support')]);
+    expect(find.text("Couldn't open the page. Visit https://tapin360.co/en/support"), findsOneWidget);
   });
 
   testWidgets('Arabic, right-to-left', (tester) async {
